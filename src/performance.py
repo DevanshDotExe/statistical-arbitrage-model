@@ -1,5 +1,3 @@
-# src/performance.py
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -16,24 +14,19 @@ def calculate_performance_metrics(portfolio_df):
     """
     metrics = {}
     
-    # Total Cumulative Return
     total_return = portfolio_df['cumulative_returns'].iloc[-1] - 1
     metrics['Total Return'] = f"{total_return:.2%}"
     
-    # Annualized Return
     days = (portfolio_df.index[-1] - portfolio_df.index[0]).days
     annualized_return = (1 + total_return) ** (365.0 / days) - 1
     metrics['Annualized Return'] = f"{annualized_return:.2%}"
 
-    # Annualized Volatility
     annualized_volatility = portfolio_df['strategy_returns'].std() * np.sqrt(252)
     metrics['Annualized Volatility'] = f"{annualized_volatility:.2%}"
 
-    # Sharpe Ratio (assuming risk-free rate is 0)
     sharpe_ratio = annualized_return / annualized_volatility if annualized_volatility != 0 else 0
     metrics['Sharpe Ratio'] = f"{sharpe_ratio:.2f}"
 
-    # Maximum Drawdown
     cumulative_returns = portfolio_df['cumulative_returns']
     running_max = cumulative_returns.cummax()
     drawdown = (cumulative_returns - running_max) / running_max
@@ -54,20 +47,17 @@ def plot_performance(portfolio_df, pair_info):
     
     fig.suptitle(f'Backtest Performance: {stock1_ticker} and {stock2_ticker}', fontsize=16)
 
-    # Plot 1: Equity Curve
     ax1.plot(portfolio_df['cumulative_returns'], label='Strategy Cumulative Returns', color='royalblue', lw=2)
     ax1.set_title('Equity Curve')
     ax1.set_ylabel('Cumulative Returns')
     ax1.legend()
     ax1.grid(True)
 
-    # Plot 2: Z-Score with Trades
     ax2.plot(portfolio_df['z_score'], label='Z-Score', color='forestgreen', lw=1.5)
     ax2.axhline(2.0, color='red', linestyle='--', lw=1)
     ax2.axhline(-2.0, color='green', linestyle='--', lw=1)
     ax2.axhline(0.0, color='black', linestyle=':', lw=1)
     
-    # Overlay trade entry/exit points
     long_signals = portfolio_df[portfolio_df['position'] == 1].index
     short_signals = portfolio_df[portfolio_df['position'] == -1].index
     
